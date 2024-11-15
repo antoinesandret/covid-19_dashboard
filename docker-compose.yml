@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: docker-next
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017/covidb
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:7.0
+    container_name: docker-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+      - ./mongodb-init/csv-files:/data/csv-files
+      - ./mongodb-init/import.sh:/docker-entrypoint-initdb.d/import.sh
+    environment:
+      - MONGO_INITDB_DATABASE=covidb
+
+volumes:
+  mongo-data:
